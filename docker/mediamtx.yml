@@ -1,0 +1,29 @@
+logLevel: info
+
+# Media protocols
+rtsp: yes
+rtspAddress: :8554
+rtmp: yes
+rtmpAddress: :1935
+hls: yes
+hlsAddress: :8888
+webrtc: no
+
+# Recording
+record: yes
+recordPath: /recordings/%path/%Y-%m-%d_%H-%M-%S
+
+# Path defaults
+pathDefaults:
+  source: publisher
+  sourceOnDemand: no
+  runOnReady: >-
+    sh -c 'echo Stream ready: $MTX_PATH'
+
+paths:
+  all:
+    # Allows any publishing path name (cam01, cam02, etc.)
+  cam01:
+    # Optional dedicated settings per camera
+  cam02:
+    # Optional dedicated settings per camera
