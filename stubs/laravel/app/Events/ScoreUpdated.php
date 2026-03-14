@@ -2,9 +2,6 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -14,30 +11,21 @@ use Illuminate\Queue\SerializesModels;
 
 class ScoreUpdated implements ShouldBroadcastNow
 {
-    use Dispatchable;
-    use InteractsWithSockets;
-    use SerializesModels;
+    use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
         public int $matchId,
         public int $homeScore,
         public int $awayScore,
         public string $updatedBy
-        public string $homeTeam,
-        public string $awayTeam,
-        public int $homeScore,
-        public int $awayScore,
-        public ?string $updatedBy = null,
     ) {
     }
 
     public function broadcastOn(): array
     {
         return [
-            new Channel('score.public'),
-            new PrivateChannel("score.match.{$this->matchId}"),
-            new Channel('scoreboard.' . $this->matchId),
-            new PrivateChannel('private-match.' . $this->matchId),
+            new Channel('scores.public'),
+            new PrivateChannel("scores.match.{$this->matchId}"),
         ];
     }
 
@@ -50,8 +38,6 @@ class ScoreUpdated implements ShouldBroadcastNow
     {
         return [
             'match_id' => $this->matchId,
-            'home_team' => $this->homeTeam,
-            'away_team' => $this->awayTeam,
             'home_score' => $this->homeScore,
             'away_score' => $this->awayScore,
             'updated_by' => $this->updatedBy,
