@@ -1,0 +1,35 @@
+logLevel: info
+api: yes
+apiAddress: :9997
+
+# Global recording defaults
+record: yes
+recordPath: /recordings/%path/%Y-%m-%d_%H-%M-%S
+recordFormat: fmp4
+recordPartDuration: 1s
+recordSegmentDuration: 1h
+
+# Protocol listeners
+rtspAddress: :8554
+rtmpAddress: :1935
+hlsAddress: :8888
+webrtcAddress: :8889
+
+paths:
+  # Approach A: Camera pushes directly to platform
+  camera/front_gate:
+    # publish via:
+    # rtsp://server:8554/camera/front_gate
+    # rtmp://server:1935/camera/front_gate
+    record: yes
+
+  # Approach B: Server pulls stream from remote/local IP camera
+  camera/warehouse:
+    source: rtsp://user:password@192.168.1.50:554/stream1
+    sourceOnDemand: yes
+    sourceProtocol: automatic
+    record: yes
+
+  # Optional path for outbound transcoded relay input
+  relay/youtube_source:
+    record: no
