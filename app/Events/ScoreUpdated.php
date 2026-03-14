@@ -2,6 +2,9 @@
 
 namespace App\Events;
 
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -17,6 +20,9 @@ class ScoreUpdated implements ShouldBroadcastNow
 
     public function __construct(
         public int $matchId,
+        public int $homeScore,
+        public int $awayScore,
+        public string $updatedBy
         public string $homeTeam,
         public string $awayTeam,
         public int $homeScore,
@@ -28,6 +34,8 @@ class ScoreUpdated implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
+            new Channel('score.public'),
+            new PrivateChannel("score.match.{$this->matchId}"),
             new Channel('scoreboard.' . $this->matchId),
             new PrivateChannel('private-match.' . $this->matchId),
         ];

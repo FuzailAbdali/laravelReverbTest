@@ -18,6 +18,18 @@ class ScoreController extends Controller
             'away_score' => ['required', 'integer', 'min:0'],
         ]);
 
+        broadcast(new ScoreUpdated(
+            matchId: $matchId,
+            homeScore: $payload['home_score'],
+            awayScore: $payload['away_score'],
+            updatedBy: (string) optional($request->user())->id ?: 'system'
+        ));
+
+        return response()->json([
+            'ok' => true,
+            'match_id' => $matchId,
+            'home_score' => $payload['home_score'],
+            'away_score' => $payload['away_score'],
         $score = MatchScore::updateOrCreate(
             ['match_id' => $matchId],
             [

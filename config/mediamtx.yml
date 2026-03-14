@@ -1,0 +1,31 @@
+logLevel: info
+
+rtsp: yes
+rtmp: yes
+hls: yes
+webrtc: yes
+
+rtspAddress: :8554
+rtmpAddress: :1935
+hlsAddress: :8888
+webrtcAddress: :8889
+webrtcLocalUDPAddress: :8189
+
+record: yes
+recordPath: /recordings/%path/%Y-%m-%d_%H-%M-%S
+recordFormat: fmp4
+recordPartDuration: 1s
+recordSegmentDuration: 1h
+
+paths:
+  # Approach A: camera pushes to this path.
+  cam1:
+    source: publisher
+
+  # Approach B example: server pulls source from camera directly.
+  # cam1:
+  #   source: rtsp://user:pass@192.168.1.10:554/stream1
+
+  # You can create additional camera paths.
+  cam2:
+    source: publisher
