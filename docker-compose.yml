@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: lrt-redis
+    ports:
+      - '6379:6379'
+
+  reverb:
+    image: ghcr.io/laravel/reverb:latest
+    container_name: lrt-reverb
+    environment:
+      REVERB_HOST: 0.0.0.0
+      REVERB_PORT: 8080
+      REVERB_APP_ID: local-app-id
+      REVERB_APP_KEY: local-app-key
+      REVERB_APP_SECRET: local-app-secret
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - '8080:8080'
+    depends_on:
+      - redis
+
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: lrt-mediamtx
+    volumes:
+      - ./config/mediamtx.yml:/mediamtx.yml:ro
+      - ./recordings:/recordings
+    ports:
+      - '8554:8554'   # RTSP
+      - '1935:1935'   # RTMP
+      - '8888:8888'   # HLS / API
+      - '8889:8889'   # WebRTC HTTP
+      - '8189:8189/udp' # WebRTC ICE/UDP
+
+  app:
+    image: php:8.3-cli
+    container_name: lrt-app
+    command: ['php', '-S', '0.0.0.0:8000', '-t', 'public']
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html
+    ports:
+      - '8000:8000'
+    depends_on:
+      - redis
+      - reverb
+      - mediamtx
