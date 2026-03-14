@@ -1,0 +1,12 @@
+<?php
+
+use App\Http\Controllers\CameraSourceController;
+use App\Http\Controllers\ScoreController;
+use Illuminate\Support\Facades\Route;
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/matches/{matchId}/score', [ScoreController::class, 'update']);
+
+    Route::get('/cameras', [CameraSourceController::class, 'index']);
+    Route::post('/cameras', [CameraSourceController::class, 'store']);
+});
