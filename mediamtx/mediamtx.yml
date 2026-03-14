@@ -1,0 +1,32 @@
+logLevel: info
+
+rtspAddress: :8554
+rtmpAddress: :1935
+hlsAddress: :8888
+webrtcAddress: :8889
+
+record: yes
+recordPath: /recordings/%path/%Y-%m-%d_%H-%M-%S
+recordFormat: fmp4
+recordPartDuration: 1s
+recordSegmentDuration: 1h
+
+paths:
+  camera_push:
+    source: publisher
+
+  camera_pull:
+    # Example server-pull source. Override dynamically for real cameras
+    # by generating paths per camera in your management layer.
+    source: rtsp://username:password@192.168.1.100:554/stream1
+    sourceOnDemand: yes
+
+  youtube_relay:
+    source: publisher
+    runOnReady: >-
+      ffmpeg -re -i rtsp://127.0.0.1:$RTSP_PORT/$MTX_PATH
+      -c:v copy -c:a aac -f flv ${YOUTUBE_RTMP_URL}/${YOUTUBE_STREAM_KEY}
+    runOnReadyRestart: yes
+
+  all_others:
+    source: publisher
