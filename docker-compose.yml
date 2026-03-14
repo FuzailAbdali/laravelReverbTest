@@ -65,3 +65,64 @@ services:
     volumes:
       - ./mediamtx/mediamtx.yml:/mediamtx.yml:ro
       - ./recordings:/recordings
+version: '3.9'
+
+services:
+  redis:
+    image: redis:7-alpine
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: lrt-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: mediamtx
+    ports:
+      - "8554:8554" # RTSP
+      - "1935:1935" # RTMP
+      - "8888:8888" # HLS/http
+    volumes:
+      - ./docker/mediamtx.yml:/mediamtx.yml:ro
+      - ./recordings:/recordings
+    command: ["/mediamtx", "/mediamtx.yml"]
+
+  # Placeholder for Laravel app runtime. Add your app Dockerfile when ready.
+  app:
+    image: php:8.3-cli
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    command: ["php", "-S", "0.0.0.0:8000", "-t", "public"]
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+
+  # Optional: Reverb websocket listener (adapt to your final app image)
+  reverb:
+    image: php:8.3-cli
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+    container_name: lrt-mediamtx
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./mediamtx/mediamtx.yml:/mediamtx.yml:ro
+      - ./recordings:/recordings
+    ports:
+      - "8554:8554"       # RTSP
+      - "1935:1935"       # RTMP
+      - "8888:8888"       # HLS
+      - "8889:8889/udp"   # WebRTC UDP
+      - "8889:8889/tcp"   # WebRTC TCP fallback
