@@ -1,0 +1,23 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: lrt-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: lrt-mediamtx
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./mediamtx/mediamtx.yml:/mediamtx.yml:ro
+      - ./recordings:/recordings
+    ports:
+      - "8554:8554"       # RTSP
+      - "1935:1935"       # RTMP
+      - "8888:8888"       # HLS
+      - "8889:8889/udp"   # WebRTC UDP
+      - "8889:8889/tcp"   # WebRTC TCP fallback
